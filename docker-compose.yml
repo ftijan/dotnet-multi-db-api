@@ -1,0 +1,39 @@
+version: '3.4'
+services:
+  redis:
+    image: "redis:7-alpine"
+    environment:
+      REDIS_ARGS: "--requirepass password --user username on >password ~* allcommands --user default off nopass nocommands"
+    ports:
+      - 8001:8001
+      - 6379:6379
+    volumes:
+      - "C:/tmp/redis_data:/var/lib/redis/data" # need to create windows folder manually
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db
+    ports:
+      - 5432:5432
+    volumes:
+      - "C:/tmp/postgres_data:/var/lib/postgresql/data" # need to create windows folder manually
+  cassandra:
+    image: cassandra:4.0
+    environment:
+      - CASSANDRA_CLUSTER_NAME=clocal # u: cassandra, p: cassandra
+    ports:
+      - 9042:9042
+    volumes:
+      - "C:/tmp/cassandra_data:/var/lib/cassandra" # need to create windows folder manually
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=user
+      - MONGODB_INITDB_ROOT_PASSWORD=pass
+    ports:
+      - 27017:27017
+    volumes:
+      - "C:/tmp/mongo_data:/data/db" # need to create windows folder manually
