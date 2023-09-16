@@ -1,4 +1,6 @@
 using Cassandra;
+using Example.MultiDbApi.Model;
+using MongoDB.Driver;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,12 @@ options.User = builder.Configuration.GetValue<string>("Redis:User");
 options.Password = builder.Configuration.GetValue<string>("Redis:Password");
 ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(options);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+// MongoDB - assumes the DB and collection exist
+var mongoClient = new MongoClient(builder.Configuration.GetValue<string>("MongoDB:Uri"));
+var mongoDb = mongoClient.GetDatabase(builder.Configuration.GetValue<string>("MongoDB:DB"));
+var usersCollection = mongoDb.GetCollection<MongoUser>(builder.Configuration.GetValue<string>("MongoDB:Collection"));
+builder.Services.AddSingleton(usersCollection);
 
 var app = builder.Build();
 
