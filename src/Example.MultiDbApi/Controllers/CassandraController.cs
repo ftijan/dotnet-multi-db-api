@@ -43,7 +43,7 @@ namespace Example.MultiDbApi.Controllers
 		[HttpGet("cassandra-users")]
 		public async Task<IActionResult> GetCassandraUsers()
 		{
-			var retrievedUsers = await GetCassandraUsersInternal();
+			var retrievedUsers = await GetCassandraReadUsersInternal();
 
 			return Ok(retrievedUsers);
 		}
@@ -87,6 +87,16 @@ namespace Example.MultiDbApi.Controllers
 			}
 
 			return retrievedUsers;
+		}
+
+		private async Task<List<string>> GetCassandraReadUsersInternal()
+		{
+			Cassandra.ISession session = await _cassandraCluster.ConnectAsync();
+			IMapper mapper = new Mapper(session);
+
+			var users = await mapper.FetchAsync<CassandraReadUser>();			
+
+			return users.Select(x => x.FullName).ToList();
 		}
 	}
 }
