@@ -10,18 +10,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Cassandra
 Cluster cluster = Cluster
 				.Builder()
-				.WithCredentials("cassandra", "cassandra")
-				.WithPort(9042)
-				.AddContactPoint("localhost")
+				.WithCredentials(builder.Configuration.GetValue<string>("Cassandra:User"), builder.Configuration.GetValue<string>("Cassandra:Password"))
+				.WithPort(builder.Configuration.GetValue<int>("Cassandra:Port"))
+				.AddContactPoint(builder.Configuration.GetValue<string>("Cassandra:Uri"))
 				.Build();
 builder.Services.AddSingleton<ICluster>(cluster);
 
-
-var options = ConfigurationOptions.Parse("localhost:6379");
-options.User = "user";
-options.Password = "pass";
+// Redis
+var options = ConfigurationOptions.Parse(builder.Configuration.GetValue<string>("Redis:Uri"));
+options.User = builder.Configuration.GetValue<string>("Redis:User");
+options.Password = builder.Configuration.GetValue<string>("Redis:Password");
 ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(options);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
