@@ -1,6 +1,7 @@
 using Cassandra;
 using Example.MultiDbApi.Model;
 using MongoDB.Driver;
+using Npgsql;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,11 @@ var mongoClient = new MongoClient(builder.Configuration.GetValue<string>("MongoD
 var mongoDb = mongoClient.GetDatabase(builder.Configuration.GetValue<string>("MongoDB:DB"));
 var usersCollection = mongoDb.GetCollection<MongoUser>(builder.Configuration.GetValue<string>("MongoDB:Collection"));
 builder.Services.AddSingleton(usersCollection);
+
+// PostgresQL
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("postgres"));
+await using var dataSource = dataSourceBuilder.Build();
+builder.Services.AddSingleton(dataSource);
 
 var app = builder.Build();
 
